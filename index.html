@@ -1,0 +1,935 @@
+<!-- Nightly iOS Application Website Created by Julia Teleki on November 13, 2025 -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Nightly – A Gentle Journaling App for iOS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Nightly is a simple, calming SwiftUI journaling app that helps you reflect on your day in just a few minutes."
+    />
+
+    <style>
+      :root {
+        --bg: #070b12;
+        --bg-alt: #0f1724;
+        --accent: #7f5af0;
+        --accent-soft: rgba(127, 90, 240, 0.15);
+        --text: #f9fafb;
+        --text-muted: #9ca3af;
+        --border-subtle: rgba(148, 163, 184, 0.3);
+        --radius-lg: 18px;
+        --radius-xl: 26px;
+        --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.6);
+        --shadow-subtle: 0 8px 24px rgba(15, 23, 42, 0.7);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+          "Helvetica Neue", Arial, sans-serif;
+        background: radial-gradient(circle at top, #111827 0, #020617 55%);
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .page {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* NAVBAR */
+
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        backdrop-filter: blur(16px);
+        background: linear-gradient(
+          to bottom,
+          rgba(2, 6, 23, 0.9),
+          rgba(2, 6, 23, 0.7),
+          transparent
+        );
+        border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+      }
+
+      .nav-inner {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .logo-mark {
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        background: radial-gradient(
+          circle at 30% 20%,
+          #f9fafb 0,
+          #e5e7eb 18%,
+          #1f2937 55%
+        );
+        box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.3),
+          0 12px 30px rgba(15, 23, 42, 0.8);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .logo-moon {
+        position: absolute;
+        inset: 7px;
+        border-radius: 999px;
+        background: radial-gradient(
+          circle at 30% 20%,
+          #f9fafb 0,
+          #e5e7eb 35%,
+          #9ca3af 90%
+        );
+        transform: translateX(-3px);
+      }
+
+      .logo-glow {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at 30% 20%,
+          rgba(129, 140, 248, 0.7),
+          transparent 55%
+        );
+        mix-blend-mode: screen;
+      }
+
+      .nav-title {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+      }
+
+      .nav-title-main {
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        font-size: 1.05rem;
+      }
+
+      .nav-title-sub {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        font-size: 0.9rem;
+      }
+
+      .nav-link {
+        color: var(--text-muted);
+        position: relative;
+        padding-bottom: 2px;
+      }
+
+      .nav-link:hover {
+        color: var(--text);
+      }
+
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 2px;
+        width: 0;
+        background: linear-gradient(to right, #7f5af0, #22d3ee);
+        border-radius: 999px;
+        transition: width 0.2s ease-out;
+      }
+
+      .nav-link:hover::after {
+        width: 100%;
+      }
+
+      .nav-cta {
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.45);
+        background: radial-gradient(
+          circle at top left,
+          rgba(148, 163, 248, 0.12),
+          transparent 55%
+        );
+        color: var(--text);
+        font-size: 0.85rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.7);
+      }
+
+      .nav-cta span {
+        font-size: 1.05rem;
+        line-height: 0;
+      }
+
+      .nav-cta:hover {
+        border-color: rgba(209, 213, 219, 0.9);
+        background: radial-gradient(
+          circle at top left,
+          rgba(129, 140, 248, 0.18),
+          transparent 60%
+        );
+      }
+
+      /* MAIN CONTENT */
+
+      main {
+        flex: 1;
+      }
+
+      .hero {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 56px 20px 64px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr);
+        gap: 40px;
+        align-items: center;
+      }
+
+      .eyebrow {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--text-muted);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .eyebrow-pill {
+        height: 2px;
+        width: 34px;
+        border-radius: 999px;
+        background: linear-gradient(to right, #22d3ee, #7f5af0);
+        opacity: 0.9;
+      }
+
+      .hero-title {
+        font-size: clamp(2.35rem, 4vw, 3rem);
+        line-height: 1.05;
+        margin: 0 0 18px;
+        letter-spacing: 0.02em;
+      }
+
+      .hero-title span {
+        background: linear-gradient(to right, #e5e7eb, #a5b4fc);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .hero-subtitle {
+        font-size: 0.98rem;
+        line-height: 1.6;
+        color: var(--text-muted);
+        max-width: 34rem;
+        margin-bottom: 26px;
+      }
+
+      .hero-subtle {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .hero-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 26px;
+        font-size: 0.78rem;
+      }
+
+      .badge {
+        border-radius: 999px;
+        padding: 6px 12px;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        background: radial-gradient(
+          circle at top left,
+          rgba(148, 163, 248, 0.12),
+          transparent 60%
+        );
+        color: var(--text-muted);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+      }
+
+      .badge-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: #22c55e;
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.25);
+      }
+
+      .badge-moon {
+        font-size: 0.9rem;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .btn-primary {
+        padding: 11px 18px;
+        border-radius: 999px;
+        border: none;
+        outline: none;
+        font-size: 0.92rem;
+        font-weight: 500;
+        cursor: pointer;
+        background: linear-gradient(to right, #6366f1, #a855f7);
+        color: #f9fafb;
+        box-shadow: var(--shadow-soft);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-primary span {
+        font-size: 1.1rem;
+      }
+
+      .btn-secondary {
+        padding: 10px 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.55);
+        background: radial-gradient(
+          circle at top left,
+          rgba(30, 64, 175, 0.2),
+          transparent 65%
+        );
+        color: var(--text);
+        font-size: 0.9rem;
+        font-weight: 400;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      .btn-secondary span {
+        font-size: 1.05rem;
+        transform: translateY(1px);
+      }
+
+      /* PHONE PREVIEW CARD */
+
+      .preview-wrap {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .phone-shell {
+        width: min(320px, 100%);
+        aspect-ratio: 9 / 19;
+        border-radius: 34px;
+        border: 1px solid rgba(148, 163, 184, 0.55);
+        background: radial-gradient(
+          circle at top left,
+          #020617,
+          #020617 40%,
+          #020617 100%
+        );
+        padding: 12px;
+        box-shadow: var(--shadow-soft);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .phone-bezel {
+        border-radius: 26px;
+        background: radial-gradient(
+          circle at top,
+          #020617,
+          #020617 60%,
+          #020617
+        );
+        padding: 12px 12px 14px;
+        border: 1px solid rgba(30, 64, 175, 0.55);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .phone-notch {
+        position: absolute;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 110px;
+        height: 18px;
+        border-radius: 99px;
+        background: linear-gradient(to bottom, #020617, #020617);
+        border: 1px solid rgba(15, 23, 42, 0.9);
+      }
+
+      .phone-screen {
+        position: relative;
+        margin-top: 4px;
+        height: 100%;
+        border-radius: 20px;
+        background: radial-gradient(
+          circle at top,
+          #020617,
+          #020617 45%,
+          #020617 100%
+        );
+        border: 1px solid rgba(30, 64, 175, 0.7);
+        padding: 16px 14px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        overflow: hidden;
+      }
+
+      .screen-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.7rem;
+        color: var(--text-muted);
+      }
+
+      .screen-pill {
+        padding: 4px 9px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.7rem;
+      }
+
+      .screen-pill-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: #22c55e;
+      }
+
+      .screen-title {
+        font-size: 0.82rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .screen-subtitle {
+        font-size: 0.68rem;
+        color: var(--text-muted);
+      }
+
+      .screen-card {
+        border-radius: 14px;
+        padding: 12px 12px 11px;
+        background: radial-gradient(
+          circle at top left,
+          rgba(79, 70, 229, 0.35),
+          rgba(15, 23, 42, 0.98)
+        );
+        border: 1px solid rgba(129, 140, 248, 0.7);
+        box-shadow: 0 14px 32px rgba(17, 24, 39, 0.9);
+      }
+
+      .screen-card-tag {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.17em;
+        color: #c7d2fe;
+        opacity: 0.9;
+        margin-bottom: 6px;
+      }
+
+      .screen-card-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      .screen-card-body {
+        font-size: 0.72rem;
+        color: #e5e7eb;
+        line-height: 1.5;
+      }
+
+      .screen-entries {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .entry-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.7rem;
+        padding: 8px 9px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        color: #e5e7eb;
+      }
+
+      .entry-date {
+        font-weight: 500;
+        font-size: 0.7rem;
+      }
+
+      .entry-mood {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.7rem;
+        color: #a5b4fc;
+      }
+
+      .entry-bullet {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: #7f5af0;
+      }
+
+      .screen-footer {
+        margin-top: auto;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .screen-btn {
+        flex: 1;
+        padding: 8px 10px;
+        border-radius: 999px;
+        border: none;
+        font-size: 0.72rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: default;
+      }
+
+      .screen-btn-primary {
+        background: linear-gradient(to right, #6366f1, #a855f7);
+        color: #f9fafb;
+      }
+
+      .screen-btn-ghost {
+        background: rgba(15, 23, 42, 0.96);
+        color: var(--text-muted);
+        border: 1px solid rgba(75, 85, 99, 0.9);
+      }
+
+      .screen-lock {
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      /* FEATURES */
+
+      .section {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 0 20px 72px;
+      }
+
+      .section-header {
+        margin-bottom: 28px;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 18px;
+        align-items: flex-end;
+      }
+
+      .section-title {
+        font-size: 1.3rem;
+        font-weight: 550;
+        letter-spacing: 0.03em;
+      }
+
+      .section-subtitle {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        max-width: 28rem;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .feature-card {
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-subtle);
+        background: radial-gradient(
+          circle at top left,
+          rgba(15, 23, 42, 0.9),
+          #020617
+        );
+        padding: 16px 16px 14px;
+        box-shadow: var(--shadow-subtle);
+      }
+
+      .feature-label {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+      }
+
+      .feature-name {
+        font-size: 0.98rem;
+        font-weight: 500;
+        margin-bottom: 6px;
+      }
+
+      .feature-body {
+        font-size: 0.86rem;
+        line-height: 1.6;
+        color: var(--text-muted);
+      }
+
+      /* FOOTER */
+
+      footer {
+        border-top: 1px solid rgba(148, 163, 184, 0.3);
+        background: radial-gradient(
+          circle at top,
+          rgba(15, 23, 42, 0.9),
+          #020617
+        );
+      }
+
+      .footer-inner {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 16px 20px 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+      }
+
+      .footer-links {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .footer-link {
+        color: var(--text-muted);
+      }
+
+      .footer-link:hover {
+        color: var(--text);
+      }
+
+      @media (max-width: 860px) {
+        .hero {
+          grid-template-columns: minmax(0, 1.1fr);
+          padding-top: 40px;
+        }
+
+        .preview-wrap {
+          justify-content: flex-start;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .nav-inner {
+          padding-inline: 16px;
+        }
+
+        .nav-links {
+          gap: 14px;
+          font-size: 0.84rem;
+        }
+
+        .hero {
+          padding-inline: 16px;
+        }
+
+        .features-grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .section {
+          padding-inline: 16px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="page">
+      <header class="nav">
+        <div class="nav-inner">
+          <div class="nav-left">
+            <div class="logo-mark">
+              <div class="logo-moon"></div>
+              <div class="logo-glow"></div>
+            </div>
+            <div class="nav-title">
+              <span class="nav-title-main">Nightly</span>
+              <span class="nav-title-sub">Gentle journaling for iOS</span>
+            </div>
+          </div>
+          <div class="nav-links">
+            <a href="#features" class="nav-link">How it works</a>
+            <a href="privacy.html" class="nav-link">Privacy</a>
+            <a href="#download" class="nav-cta">
+              Download on iOS
+              <span>↗</span>
+            </a>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div>
+            <div class="eyebrow">
+              <span class="eyebrow-pill"></span>
+              <span>SwiftUI journaling app</span>
+            </div>
+            <h1 class="hero-title">
+              Wind down your day with <span>Nightly</span>.
+            </h1>
+            <p class="hero-subtitle">
+              Nightly is a simple, calming journaling app built with SwiftUI
+              that helps you reflect on your day in just a few minutes. Answer a
+              few guided prompts, note your mood, and gently build a private
+              record of your days over time.
+            </p>
+
+            <div class="hero-badges">
+              <div class="badge">
+                <span class="badge-dot"></span>
+                Data stays on your device
+              </div>
+              <div class="badge">
+                <span class="badge-moon">🌙</span>
+                Designed for nighttime reflection
+              </div>
+              <div class="badge">✅ No accounts, no ads, no tracking</div>
+            </div>
+
+            <div class="hero-actions" id="download">
+              <!-- Replace the # with your real App Store link when you have it -->
+              <a href="#" class="btn-primary">
+                <span></span>
+                <span>Get Nightly for iPhone</span>
+              </a>
+
+              <a href="privacy.html" class="btn-secondary">
+                Read privacy policy
+                <span>→</span>
+              </a>
+            </div>
+
+            <div class="hero-subtle">
+              <span>•</span>
+              <span>
+                Your entries are securely stored on your device. Nightly never
+                sends your journal data to a server.
+              </span>
+            </div>
+          </div>
+
+          <div class="preview-wrap">
+            <div class="phone-shell">
+              <div class="phone-bezel">
+                <div class="phone-notch"></div>
+                <div class="phone-screen">
+                  <div class="screen-header">
+                    <div>
+                      <div class="screen-title">
+                        Nightly
+                        <span>🌙</span>
+                      </div>
+                      <div class="screen-subtitle">
+                        One quiet check-in before sleep.
+                      </div>
+                    </div>
+                    <div class="screen-pill">
+                      <span class="screen-pill-dot"></span>
+                      Reflecting
+                    </div>
+                  </div>
+
+                  <div class="screen-card">
+                    <div class="screen-card-tag">Tonight’s reflection</div>
+                    <div class="screen-card-title">
+                      What stood out about today?
+                    </div>
+                    <div class="screen-card-body">
+                      Nightly gives you gentle questions to help you slow down,
+                      process your day, and capture the moments you don’t want
+                      to forget.
+                    </div>
+                  </div>
+
+                  <div class="screen-entries">
+                    <div class="entry-row">
+                      <span class="entry-date">Today • 10:34 PM</span>
+                      <span class="entry-mood">
+                        <span class="entry-bullet"></span>
+                        Grateful
+                      </span>
+                    </div>
+                    <div class="entry-row">
+                      <span class="entry-date">Yesterday</span>
+                      <span class="entry-mood">
+                        <span class="entry-bullet"></span>
+                        Hopeful
+                      </span>
+                    </div>
+                    <div class="entry-row">
+                      <span class="entry-date">This week</span>
+                      <span class="entry-mood">
+                        <span class="entry-bullet"></span>
+                        Mixed
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="screen-footer">
+                    <button class="screen-btn screen-btn-primary">
+                      ✏️ New entry
+                    </button>
+                    <button class="screen-btn screen-btn-ghost">
+                      📖 History
+                    </button>
+                  </div>
+
+                  <div class="screen-lock">
+                    🔒 Private & stored on this device only
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="features">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Why Nightly?</h2>
+            </div>
+            <p class="section-subtitle">
+              Nightly focuses on being calm, predictable, and private. No
+              streaks screaming at you, no pushy social feeds—just a quiet space
+              for you to check in with yourself before bed.
+            </p>
+          </div>
+
+          <div class="features-grid">
+            <article class="feature-card">
+              <div class="feature-label">Focus</div>
+              <h3 class="feature-name">Guided nightly check-ins</h3>
+              <p class="feature-body">
+                Each night, Nightly asks you a short set of questions to help
+                you reflect: What stood out? How did you feel? What do you want
+                to remember? It’s quick enough to keep up with, but meaningful
+                enough to matter.
+              </p>
+            </article>
+
+            <article class="feature-card">
+              <div class="feature-label">Design</div>
+              <h3 class="feature-name">Built with SwiftUI for iOS</h3>
+              <p class="feature-body">
+                Nightly is written in SwiftUI, designed to feel at home on
+                iPhone with smooth transitions, dark-mode friendly colors, and a
+                layout that’s easy on tired eyes at the end of the day.
+              </p>
+            </article>
+
+            <article class="feature-card">
+              <div class="feature-label">Privacy</div>
+              <h3 class="feature-name">Your words stay with you</h3>
+              <p class="feature-body">
+                Your entries are stored securely on your device. Nightly does
+                not collect, upload, or sell your journal data. There are no
+                accounts to create and no analytics tracking what you write.
+              </p>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <div class="footer-inner">
+          <span>© <span id="year"></span> Nightly. All rights reserved.</span>
+          <div class="footer-links">
+            <a href="privacy.html" class="footer-link">Privacy Policy</a>
+            <!-- Optional: add a contact link or email here -->
+            <!-- <a href="mailto:youremail@example.com" class="footer-link">Contact</a> -->
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      // Set current year in footer
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>
