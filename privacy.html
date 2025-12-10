@@ -70,12 +70,30 @@
         gap: 16px;
       }
 
+      .nav-title {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+      }
+
       .nav-left {
         display: flex;
         align-items: center;
         gap: 10px;
       }
 
+      /* UPDATED: use PNG logo instead of CSS moon */
+      .logo-img {
+        width: 38px;
+        height: 38px;
+        border-radius: 999px;
+        box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.3),
+          0 12px 30px rgba(15, 23, 42, 0.8);
+        object-fit: cover;
+        display: block;
+      }
+
+      /* You can keep these unused or delete them if you like */
       .logo-mark {
         width: 30px;
         height: 30px;
@@ -120,6 +138,11 @@
         font-weight: 600;
         letter-spacing: 0.03em;
         font-size: 1.02rem;
+      }
+
+      .nav-title-sub {
+        font-size: 0.8rem;
+        color: var(--text-muted);
       }
 
       .nav-links {
@@ -293,12 +316,18 @@
       <header class="nav">
         <div class="nav-inner">
           <div class="nav-left">
-            <div class="logo-mark">
-              <div class="logo-moon"></div>
-              <div class="logo-glow"></div>
+            <img
+              src="nightly_moon_app_icon_1024_v5_bluehalo.png"
+              alt="Nightly logo"
+              class="logo-img"
+            />
+
+            <div class="nav-title">
+              <span class="nav-title-main">Nightly</span>
+              <span class="nav-title-sub">Gentle journaling for iOS</span>
             </div>
-            <div class="nav-title-main">Nightly</div>
           </div>
+
           <nav class="nav-links">
             <a href="index.html" class="nav-link">Back to app</a>
           </nav>
@@ -314,7 +343,7 @@
 
           <h1>Privacy Policy</h1>
           <!-- Update this date whenever you publish a new version -->
-          <p class="last-updated">Last updated: November 13, 2025</p>
+          <p class="last-updated">Last updated: December 9, 2025</p>
 
           <div class="policy-card">
             <p class="highlight-box">
